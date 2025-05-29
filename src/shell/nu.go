@@ -3,11 +3,7 @@ package shell
 import (
 	_ "embed"
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
-
-	"github.com/jandedobbeleer/oh-my-posh/src/runtime"
 )
 
 //go:embed scripts/omp.nu
@@ -21,7 +17,7 @@ func (f Feature) Nu() Code {
 		return "^$_omp_executable upgrade"
 	case Notice:
 		return "^$_omp_executable notice"
-	case PromptMark, RPrompt, PoshGit, Azure, LineError, Jobs, Tooltips, FTCSMarks, CursorPositioning:
+	case PromptMark, RPrompt, PoshGit, Azure, LineError, Jobs, Tooltips, FTCSMarks, CursorPositioning, Async:
 		fallthrough
 	default:
 		return ""
@@ -34,19 +30,4 @@ func quoteNuStr(str string) string {
 	}
 
 	return fmt.Sprintf(`"%s"`, strings.NewReplacer(`\`, `\\`, `"`, `\"`).Replace(str))
-}
-
-func createNuInit(env runtime.Environment, features Features) {
-	initPath := filepath.Join(env.Home(), ".oh-my-posh.nu")
-	f, err := os.OpenFile(initPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
-	if err != nil {
-		return
-	}
-
-	_, err = f.WriteString(PrintInit(env, features, nil))
-	if err != nil {
-		return
-	}
-
-	_ = f.Close()
 }
